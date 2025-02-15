@@ -29,6 +29,10 @@ let gameOver = false;
 // Global variable to store leaderboard data
 let leaderboardData = [];
 
+let purpleFood = null;
+let purpleFoodSpawnTime = 0;
+let shedSegments = [];
+
 // Cookie functions to store/retrieve high score
 function setCookie(name, value, days) {
     const d = new Date();
@@ -77,13 +81,12 @@ function init() {
 function gameLoop() {
     if (isPaused || gameOver) return;
     
-    // Update snake's direction based on last key press
     direction = nextDirection;
     const head = {
-    x: snake[snake.length - 1].x + direction.x,
-    y: snake[snake.length - 1].y + direction.y
+        x: snake[snake.length - 1].x + direction.x,
+        y: snake[snake.length - 1].y + direction.y
     };
-    
+
     // Check wall collisions
     if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) {
         endGame();
@@ -99,16 +102,37 @@ function gameLoop() {
     
     snake.push(head);
     
-    // Check food consumption
+    // If snake eats red food...
     if (head.x === food.x && head.y === food.y) {
         foodCounter++;
         score += foodCounter;
         updateScore();
         placeFood();
-    // Start the pulse effect from the head (which is the last element)
+        // Remove purple fruit if it exists.
+        // purpleFood = null;
         pulseStart = performance.now();
+    }
+    // Else if snake eats purple fruit...
+    else if (purpleFood && head.x === purpleFood.x && head.y === purpleFood.y) {
+        // Calculate 20% of the snake's length (at least 1 segment)
+        let segmentsToShed = Math.max(Math.floor(snake.length * 0.2), 1);
+        for (let i = 0; i < segmentsToShed; i++) {
+            if (snake.length > 1) {  // Always leave at least the head.
+                let removedSegment = snake.shift();
+                shedSegments.push({ 
+                    x: removedSegment.x, 
+                    y: removedSegment.y, 
+                    startTime: performance.now() 
+                });
+            }
+        }
+        purpleFood = null;
+        score += foodCounter;
+        updateScore();
+        placeFood();
+
     } else {
-        snake.shift(); // move snake forward
+        snake.shift();
     }
     
     draw();
@@ -120,7 +144,7 @@ function draw() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw food as a circle
+    // Draw main (red) food
     ctx.fillStyle = 'red';
     ctx.beginPath();
     ctx.arc(
@@ -132,56 +156,147 @@ function draw() {
     );
     ctx.fill();
     
-    // Get current time for pulse effect calculations
+    // Get current time
     const now = performance.now();
     
-    // Draw snake with a gap and reversed pulse effect
-    ctx.fillStyle = 'lime';
-    snake.forEach((segment, index) => {
-    // Calculate reversed index so that head (last segment) gets 0 delay
-    const reversedIndex = snake.length - 1 - index;
-    let scale = 1;
-    if (pulseStart) {
-        const dt = now - pulseStart - (reversedIndex * delayBetweenSegments);
-        if (dt >= 0 && dt < pulseDuration) {
-        scale = 1 + pulseAmplitude * Math.sin(Math.PI * dt / pulseDuration);
+    // Draw purple fruit (with blinking)
+    if (purpleFood) {
+        const elapsedPurple = now - purpleFoodSpawnTime;
+        if (elapsedPurple >= 3000) {
+            // Expire the purple fruit after 3 seconds
+            purpleFood = null;
+        } else {
+            // Blink every 250ms: only draw during even cycles
+            if (Math.floor(elapsedPurple / 250) % 2 === 0) {
+                ctx.fillStyle = 'purple';
+                ctx.beginPath();
+                ctx.arc(
+                    purpleFood.x * cellSize + cellSize / 2,
+                    purpleFood.y * cellSize + cellSize / 2,
+                    cellSize / 2.5,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
         }
     }
-    const base = cellSize - gap * 2;
-    const newWidth = base * scale;
-    const newHeight = base * scale;
-    const offset = (newWidth - base) / 2;
-    ctx.fillRect(
-        segment.x * cellSize + gap - offset,
-        segment.y * cellSize + gap - offset,
-        newWidth,
-        newHeight
-    );
+    
+    // Draw snake with pulse effect
+    ctx.fillStyle = 'lime';
+    snake.forEach((segment, index) => {
+        const reversedIndex = snake.length - 1 - index;
+        let scale = 1;
+        if (pulseStart) {
+            const dt = now - pulseStart - (reversedIndex * delayBetweenSegments);
+            if (dt >= 0 && dt < pulseDuration) {
+                scale = 1 + pulseAmplitude * Math.sin(Math.PI * dt / pulseDuration);
+            }
+        }
+        const base = cellSize - gap * 2;
+        const newWidth = base * scale;
+        const newHeight = base * scale;
+        const offset = (newWidth - base) / 2;
+        ctx.fillRect(
+            segment.x * cellSize + gap - offset,
+            segment.y * cellSize + gap - offset,
+            newWidth,
+            newHeight
+        );
     });
     
-    // Clear the pulse effect once it's done propagating down the snake
+    // Animate shed segments (fade from lime to dark green)
+    const shedDuration = 1000; // Animation lasts 1 second
+    // Update the shedSegments array to remove completed animations.
+    shedSegments = shedSegments.filter(seg => {
+        const elapsed = now - seg.startTime;
+        if (elapsed > shedDuration) return false;
+        const t = elapsed / shedDuration;
+        // Interpolate green value from 255 (lime) to 100 (dark green)
+        const greenValue = Math.floor(255 - (255 - 100) * t);
+        ctx.fillStyle = `rgb(0, ${greenValue}, 0)`;
+        const base = cellSize - gap * 2;
+        ctx.fillRect(
+            seg.x * cellSize + gap,
+            seg.y * cellSize + gap,
+            base,
+            base
+        );
+        return true;
+    });
+    
+    // Clear pulse effect when finished
     if (pulseStart && now - pulseStart > (snake.length * delayBetweenSegments + pulseDuration)) {
-    pulseStart = 0;
+        pulseStart = 0;
     }
+}
+
+// New function to spawn the purple fruit at a valid position
+function spawnPurpleFood() {
+    let valid = false;
+    while (!valid) {
+        purpleFood = {
+            x: Math.floor(Math.random() * cols),
+            y: Math.floor(Math.random() * rows)
+        };
+        // Ensure it doesn't spawn on the red food
+        if (purpleFood.x === food.x && purpleFood.y === food.y) {
+            valid = false;
+            continue;
+        }
+        // Ensure it doesn't spawn on any snake segment
+        valid = true;
+        for (let segment of snake) {
+            if (segment.x === purpleFood.x && segment.y === purpleFood.y) {
+                valid = false;
+                break;
+            }
+        }
+    }
+    purpleFoodSpawnTime = performance.now();
+}
+
+function getPurpleFoodProbability() {
+    // If score is lower than 50, probability is 0%
+    if (score < 50) return 0;
+
+    const baseProbability = 0.0;       // Start with a 0% chance
+    const perSegmentIncrease = 0.001;    // Increase chance by 0.01% per extra segment
+    const capProbability = 0.11;          // Cap at 11%
+    
+    // Assume the initial snake length is 5 segments (from your init function)
+    const extraSegments = Math.max(snake.length - 5, 0);
+    const probability = baseProbability + (extraSegments * perSegmentIncrease);
+    // console.log(probability)
+    return Math.min(probability, capProbability);
 }
 
 // Place food at a random valid position (avoid snake)
 function placeFood() {
     let valid = false;
     while (!valid) {
-    food = {
-        x: Math.floor(Math.random() * cols),
-        y: Math.floor(Math.random() * rows)
-    };
-    valid = true;
-    for (let segment of snake) {
-        if (segment.x === food.x && segment.y === food.y) {
-        valid = false;
-        break;
+        food = {
+            x: Math.floor(Math.random() * cols),
+            y: Math.floor(Math.random() * rows)
+        };
+        valid = true;
+        for (let segment of snake) {
+            if (segment.x === food.x && segment.y === food.y) {
+                valid = false;
+                break;
+            }
         }
     }
+    
+    // Clear any existing purple fruit before deciding to spawn a new one
+    purpleFood = null;
+    
+    // Probability of PurpleFood spawning
+    if (Math.random() < getPurpleFoodProbability()) {
+        spawnPurpleFood();
     }
 }
+
 
 function skipScoreSubmission() {
     hideOverlay('submitScoreOverlay')
@@ -361,7 +476,6 @@ async function postScore(name, score) {
         // Check if the current score is greater than the 10th entry (index 9)
         if (score > leaderboardData[9].score) {
             qualifies = true;
-            console.log("USER QUALIFIES!")
         }
     }
     if (qualifies) {
@@ -403,6 +517,12 @@ function submitScoreFromOverlay() {
 
 // Listen for key presses: arrow keys for movement, space for pause/resume
 document.addEventListener('keydown', (e) => {
+
+    // Prevent default scrolling for arrow keys
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+    }
+
     if (gameOver) return;
     
     if (e.key === 'ArrowUp' && direction.y !== 1) {

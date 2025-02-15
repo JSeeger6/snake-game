@@ -8,84 +8,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.freesnake.org">
+  <link rel="icon" href="snake-favicon.png" type="image/png" sizes="256x256" />
+  <!-- If you prefer inline styles for demonstration, you can remove this link -->
   <link rel="stylesheet" href="style.css">
+  <!-- Inline CSS for demonstration purposes -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: #fff;
+    }
+    #page-container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    /* Container for the game area and leaderboard */
+    #top-section {
+      display: flex;
+      gap: 20px;
+      width: 740px;  /* 420px (game) + 20px (gap) + 300px (leaderboard) */
+      margin: 20px auto 0;
+      align-items: flex-start;
+    }
+    /* Main game container */
+    #main-game {
+      width: 420px;
+    }
+    #game-container {
+      position: relative;
+      background-color: #000;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    /* Leaderboard styles */
+    #leaderboard {
+      width: 300px;
+      flex-shrink: 0;
+      max-height: 400px;
+      background-color: #333;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    /* Additional styling as needed */
+  </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-00ESSH370H"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-00ESSH370H');
   </script>
 </head>
 <body>
-  <div id="score-bank">
-  </div>
-  <div id="game-container">
-    <!-- Scoreboard: Score left, High Score right -->
-    <div class="scores">
-      <div>Score: <span id="score">0</span></div>
-      <div>High Score: <span id="highScore">0</span></div>
-    </div>
-    <!-- Game Canvas -->
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <!-- Start Overlay (shown on first load) -->
-    <div class="overlay" id="startOverlay" style="display: flex;">
-      <h2>Snake Game</h2>
-      <button onclick="startGame()">Start</button>
-    </div>
-    <!-- Game Over Overlay -->
-    <div class="overlay" id="gameOverOverlay">
-      <h2>Game Over!</h2>
-      <p>Final Score: <span id="finalScore">0</span></p>
-      <p>High Score: <span id="gameOverHighScore">0</span></p>
-      <button onclick="resetGame()">Play Again</button>
-    </div>
-    <!-- Pause Overlay -->
-    <div class="overlay" id="pauseOverlay">
-      <h2>Paused</h2>
-      <p>Current Score: <span id="pauseScore">0</span></p>
-      <button onclick="resumeGame()">Resume</button>
-      <button onclick="resetGame()">Restart</button>
-    </div>
-    <!-- Controls / Instructions -->
-    <div class="controls">
-      <p>Use arrow keys to move</p>
-      <p>Press space to pause/resume</p>
-    </div>
-  </div>
-
-  <!-- Leaderboard Section -->
-  <div id="leaderboard">
-    <h2>Leaderboard</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Score</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboard-body">
-        <!-- Leaderboard entries will be inserted here -->
-      </tbody>
-    </table>
-  </div>
-
-  <div id="submitScoreOverlay" class="overlay" style="display: none;">
-    <div class="overlay-content">
-      <h2>New High Score!</h2>
-      <p>Your score: <span id="submitScoreDisplay"></span></p>
-      <input type="text" id="playerNameInput" placeholder="Enter your name" />
-      <div class="no-thanks-container">
-        <button onclick="submitScoreFromOverlay()">Submit Score</button>
-        <p class="no-thanks" onclick="skipScoreSubmission()">No thanks</p>
+  <div id="page-container">
+    <div id="top-section">
+      <div id="main-game">
+        <div id="game-container">
+          <!-- Scoreboard: Score left, High Score right -->
+          <div class="scores">
+            <div>Score: <span id="score">0</span></div>
+            <div>High Score: <span id="highScore">0</span></div>
+          </div>
+          <!-- Game Canvas -->
+          <canvas id="gameCanvas" width="400" height="400"></canvas>
+          <!-- Start Overlay (shown on first load) -->
+          <div class="overlay" id="startOverlay" style="display: flex;">
+            <h2>Snake Game</h2>
+            <button onclick="startGame()">Start</button>
+          </div>
+          <!-- Game Over Overlay -->
+          <div class="overlay" id="gameOverOverlay">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <p>High Score: <span id="gameOverHighScore">0</span></p>
+            <button onclick="resetGame()">Play Again</button>
+          </div>
+          <!-- Pause Overlay -->
+          <div class="overlay" id="pauseOverlay">
+            <h2>Paused</h2>
+            <p>Current Score: <span id="pauseScore">0</span></p>
+            <button onclick="resumeGame()">Resume</button>
+            <button onclick="resetGame()">Restart</button>
+          </div>
+          <!-- Controls / Instructions -->
+          <div class="controls">
+            <p>Use arrow keys to move</p>
+            <p>Press space to pause/resume</p>
+          </div>
+        </div>
+      </div>
+      <!-- Leaderboard Section (moved out of #main-game to be a sibling) -->
+      <div id="leaderboard">
+        <h2>Leaderboard</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Score</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <!-- Leaderboard entries will be inserted here -->
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
 
+    <div id="submitScoreOverlay" class="overlay" style="display: none;">
+      <div class="overlay-content">
+        <h2>New High Score!</h2>
+        <p>Your score: <span id="submitScoreDisplay"></span></p>
+        <input type="text" id="playerNameInput" placeholder="Enter your name" />
+        <div class="no-thanks-container">
+          <button onclick="submitScoreFromOverlay()">Submit Score</button>
+          <p class="no-thanks" onclick="skipScoreSubmission()">No thanks</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="text-container">
+      <div id="text-content">
+        <h1>Classic Snake Online</h1>
+        <p>Welcome to the best free online classic snake game! Dive into a retro arcade experience with our addictive snake game featuring minimalist design, smooth controls, and endless high score challenges. Whether you're a nostalgic gamer or a new player, our free snake game offers non-stop excitement, competitive leaderboards, and a timeless arcade vibe. Get ready to relive the vintage arcade thrill and become a snake game champion today!</p>
+        <strong>Instructions:</strong><br>
+        <p>Use your arrows to move the snake.</p>
+        <p>Collect Red food to increase your score and land a spot on the leaderboard</p>
+        <p>Collect the rare Purple food to shed the Snake to continue collecting points</p>
+        <p>Press your spacebar to pause/restart the game</p>
+        <p></p>
+      </div>
+    </div>
+
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
