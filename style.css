@@ -1,34 +1,25 @@
 body {
     margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
     background-color: #222;
     color: #fff;
-    font-family: Arial, sans-serif;
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-    min-height: 100vh;
   }
 
 /* Parent container: stack children vertically */
 #page-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers both the top and bottom sections */
     width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
+    max-width: 1000px;
+    margin: 0 auto;
   }
   
   /* Top section: display game and leaderboard in a row */
   #top-section {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
     gap: 20px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
+    width: 740px;  /* 420px (game) + 20px (gap) + 300px (leaderboard) */
+    margin: 20px auto 0;
+    align-items: flex-start;
   }
   
   /* Existing styles for #game-container, #leaderboard, and #text-container can remain as is */
@@ -46,21 +37,16 @@ body {
     margin-top: 100px;
 }
 
-  #main-game {
+#main-game {
     width: 420px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    /* gap: 20px; */
-    /* width: 100%; */
-    /* padding: 20px; */
-    /* box-sizing: border-box; */
   }
   
   /* Game container holds all UI elements */
   #game-container {
     position: relative;
-    text-align: center;
+    background-color: #000;
+    padding: 10px;
+    border-radius: 8px;
   }
   /* Scoreboard: score on left, high score on right */
   .scores {
@@ -84,6 +70,7 @@ body {
     margin-top: 10px;
     font-size: 0.9em;
     color: #ccc;
+    text-align: center;
   }
   /* Overlays for game over, pause, and start */
   .overlay {
@@ -122,17 +109,15 @@ body {
   }
 
   /* Leaderboard styling on the right */
-#leaderboard {
+  #leaderboard {
     width: 300px;
     flex-shrink: 0;
-    max-height: 400px;         /*Taller than it is wide */
-    background-color: #333;    /* Dark background to match the game */
+    max-height: 400px;
+    background-color: #333;
     border: 1px solid #fff;
     border-radius: 4px;
     padding: 10px;
-    /* align-self: center; */
-    /* margin-left: auto; */
-    overflow-y: hidden;          /* Allows scrolling if the list grows long */
+    overflow-y: auto;
   }
   
   #leaderboard h2 {
