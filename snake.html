@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Free Classic Snake Game Online</title>
+  <meta name="description" content="Play the classic Snake game online completely for free! A minimal, sleek, and elegant classic online Snake game. Play now and beat other players' high score!">
+  <meta name="keywords" content="Snake game, free snake game, online game, classic snake, free online game, snake.io, playsnake, play snake, snake game, classic">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.freesnake.org">
+  <link rel="stylesheet" href="style.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-00ESSH370H"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-00ESSH370H');
+  </script>
+</head>
+<body>
+  <div id="score-bank">
+  </div>
+  <div id="game-container">
+    <!-- Scoreboard: Score left, High Score right -->
+    <div class="scores">
+      <div>Score: <span id="score">0</span></div>
+      <div>High Score: <span id="highScore">0</span></div>
+    </div>
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <!-- Start Overlay (shown on first load) -->
+    <div class="overlay" id="startOverlay" style="display: flex;">
+      <h2>Snake Game</h2>
+      <button onclick="startGame()">Start</button>
+    </div>
+    <!-- Game Over Overlay -->
+    <div class="overlay" id="gameOverOverlay">
+      <h2>Game Over!</h2>
+      <p>Final Score: <span id="finalScore">0</span></p>
+      <p>High Score: <span id="gameOverHighScore">0</span></p>
+      <button onclick="resetGame()">Play Again</button>
+    </div>
+    <!-- Pause Overlay -->
+    <div class="overlay" id="pauseOverlay">
+      <h2>Paused</h2>
+      <p>Current Score: <span id="pauseScore">0</span></p>
+      <button onclick="resumeGame()">Resume</button>
+      <button onclick="resetGame()">Restart</button>
+    </div>
+    <!-- Controls / Instructions -->
+    <div class="controls">
+      <p>Use arrow keys to move</p>
+      <p>Press space to pause/resume</p>
+    </div>
+  </div>
+
+  <!-- Leaderboard Section -->
+  <div id="leaderboard">
+    <h2>Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Score</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Leaderboard entries will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="submitScoreOverlay" class="overlay" style="display: none;">
+    <div class="overlay-content">
+      <h2>New High Score!</h2>
+      <p>Your score: <span id="submitScoreDisplay"></span></p>
+      <input type="text" id="playerNameInput" placeholder="Enter your name" />
+      <div class="no-thanks-container">
+        <button onclick="submitScoreFromOverlay()">Submit Score</button>
+        <p class="no-thanks" onclick="skipScoreSubmission()">No thanks</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
