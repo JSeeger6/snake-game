@@ -32,6 +32,7 @@ let leaderboardData = [];
 let purpleFood = null;
 let purpleFoodSpawnTime = 0;
 let shedSegments = [];
+let countdownEnabled = true;
 
 // Cookie functions to store/retrieve high score
 function setCookie(name, value, days) {
@@ -168,7 +169,7 @@ function draw() {
         } else {
             // Blink every 250ms: only draw during even cycles
             if (Math.floor(elapsedPurple / 250) % 2 === 0) {
-                ctx.fillStyle = 'purple';
+                ctx.fillStyle = '#ff32ff';
                 ctx.beginPath();
                 ctx.arc(
                     purpleFood.x * cellSize + cellSize / 2,
@@ -231,6 +232,34 @@ function draw() {
     }
 }
 
+// Function to toggle the countdown timer on/off
+function toggleCountdown() {
+    countdownEnabled = document.getElementById('toggleCountdownButton').checked;
+}
+
+function startCountdown(callback) {
+    const countdownOverlay = document.getElementById('countdownOverlay');
+    if (!countdownOverlay) {
+        console.warn("Countdown overlay element not found!");
+        callback();
+        return;
+    }
+    countdownOverlay.style.display = 'flex';
+    let count = 3;
+    countdownOverlay.textContent = count;
+    
+    const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownOverlay.textContent = count;
+        } else {
+            clearInterval(countdownInterval);
+            countdownOverlay.style.display = 'none';
+            callback();
+        }
+    }, 1000);
+}
+
 // New function to spawn the purple fruit at a valid position
 function spawnPurpleFood() {
     let valid = false;
@@ -262,7 +291,7 @@ function getPurpleFoodProbability() {
 
     const baseProbability = 0.0;       // Start with a 0% chance
     const perSegmentIncrease = 0.001;    // Increase chance by 0.01% per extra segment
-    const capProbability = 0.11;          // Cap at 11%
+    const capProbability = 0.12;          // Cap at 12%
     
     // Assume the initial snake length is 5 segments (from your init function)
     const extraSegments = Math.max(snake.length - 5, 0);
@@ -342,13 +371,21 @@ function resumeGame() {
 
 // Reset the game entirely
 function resetGame() {
-    init();
+    if (countdownEnabled) {
+        startCountdown(init);
+    } else {
+        init();
+    }
 }
 
 // Start the game from the initial overlay
 function startGame() {
     hideOverlay('startOverlay');
-    init();
+    if (countdownEnabled) {
+        startCountdown(init);
+    } else {
+        init();
+    }
 }
 
 // Utility functions to show/hide overlays

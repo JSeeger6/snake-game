@@ -9,7 +9,6 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.freesnake.org">
   <link rel="icon" href="snake-favicon.png" type="image/png" sizes="256x256" />
-  <!-- If you prefer inline styles for demonstration, you can remove this link -->
   <link rel="stylesheet" href="style.css">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-00ESSH370H"></script>
@@ -55,6 +54,13 @@
           <div class="controls">
             <p>Use arrow keys to move</p>
             <p>Press space to pause/resume</p>
+            <div class="toggle-container">
+              <span class="toggle-label">Countdown Timer</span>
+              <label class="switch">
+                <input type="checkbox" id="toggleCountdownButton" onchange="toggleCountdown()" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -79,7 +85,7 @@
 
     <div id="submitScoreOverlay" class="overlay" style="display: none;">
       <div class="overlay-content">
-        <h2>New High Score!</h2>
+        <h2>New Leaderboard Score!</h2>
         <p>Your score: <span id="submitScoreDisplay"></span></p>
         <input type="text" id="playerNameInput" placeholder="Enter your name" />
         <div class="no-thanks-container">
@@ -89,14 +95,16 @@
       </div>
     </div>
 
+    <div id="countdownOverlay"></div>
+
     <div id="text-container">
       <div id="text-content">
         <h1>Classic Snake Online</h1>
         <p>Welcome to the best free online classic snake game! Dive into a retro arcade experience with our addictive snake game featuring minimalist design, smooth controls, and endless high score challenges. Whether you're a nostalgic gamer or a new player, our free snake game offers non-stop excitement, competitive leaderboards, and a timeless arcade vibe. Get ready to relive the vintage arcade thrill and become a snake game champion today!</p>
         <h2><strong>Instructions:</strong><br></h2>
-        <p>Use your arrows to move the snake.</p>
-        <p>Collect Red food to increase your score and land a spot on the leaderboard</p>
-        <p>Collect the rare Purple food to shed the Snake to continue collecting points</p>
+        <p>Use <strong>your arrows</strong> to move <span style="color: lime; font-weight: bold;">the snake</span>.</p>
+        <p>Collect <span style="color: red; font-weight: bold;">Red food</span> to increase your score and land a spot on the leaderboard</p>
+        <p>Collect the rare <span style="color: #ff32ff; font-weight: bold;">Purple apple</span> to shed the Snake skin and shrink in size</p>
         <p>Press your spacebar to pause/restart the game</p>
         <p></p>
       </div>
