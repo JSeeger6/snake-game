@@ -291,7 +291,7 @@ function getPurpleFoodProbability() {
 
     const baseProbability = 0.0;       // Start with a 0% chance
     const perSegmentIncrease = 0.001;    // Increase chance by 0.01% per extra segment
-    const capProbability = 0.12;          // Cap at 12%
+    const capProbability = 0.11;          // Cap at 11%
     
     // Assume the initial snake length is 5 segments (from your init function)
     const extraSegments = Math.max(snake.length - 5, 0);
