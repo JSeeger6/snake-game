@@ -549,6 +549,12 @@ function submitScoreFromOverlay() {
     }
     hideOverlay('submitScoreOverlay');
     postScore(name, score);
+    // Trigger a GA4 event for leaderboard submission
+    gtag('event', 'leaderboard_submission', {
+        'event_category': 'engagement',
+        'event_label': name,
+        'value': score
+    });
     showOverlay('startOverlay')
 }
 
